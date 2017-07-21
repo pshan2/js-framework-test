@@ -1,51 +1,77 @@
 /* Things done in front-end stage: parse scss to css, finish javascripts(concat & minifying) */
 
+/**
+ * Node modules
+ */
+var mkdirp = require('mkdirp');
 var gulp = require('gulp');
 var clean = require('gulp-clean');
+var cache = require('gulp-cache');
 var concat = require('gulp-concat');
+var rename = require('gulp-rename');
 var concatCss = require('gulp-concat-css');
 var uglify = require('gulp-uglify');
 var foreach = require('gulp-foreach');
+var imagemin = require('gulp-imagemin');
 var changed = require('gulp-changed');
 
-var resourceSrc = '_includes/';
+/**
+ * Constants
+ */
+var baseSrc = 'src/';
+var resourceSrc = baseSrc + '_includes/';
 var vmSrc = 'vm/';
-var dist = 'dist/';
+var dest = 'dest/';
+var hostname = 'qa.emory.edu';
+var username = 'pshan2';
+var password = 'Spy62710@';
+
+/**
+ * Local modules
+ */
+var index = require('./index.js');
+
+/**
+ * Local File Process
+ */
 
 //Delete Existing dist folder, then re-create it
-gulp.task('init', function() {
-    console.log('gulo init');
-    return gulp.src('dist', { read: false })
-        .pipe(clean())
-        .dist('dist');
+gulp.task('local:init', function() {
+    mkdirp('./' + dest.substring(0, dest.length - 1), function(err) {
+        if (err)
+            return false;
+        else {
+            gulp.src(dest.substring(0, dest.length - 1) + '/**/*', { read: false })
+                .pipe(clean());
+        }
+    });
+
 });
 
 // Concatenate & Minify JS -> Compare if changed -> Move to Dist Folder
-gulp.task('scripts', function() {
-    console.log('gulp - script task');
-    return gulp.src(src + 'js/*.js')
+gulp.task('local:scripts', function() {
+    console.log(dest + resourceSrc + 'javascript');
+    return gulp.src(resourceSrc + 'js/*.js')
         .pipe(concat('main.js'))
         .pipe(rename({ suffix: '.min' }))
         .pipe(uglify())
         //.changed(dest + resourceSrc + 'javascript', { hasChanged: changed.compareContent }) Compare
-        .pipe(gulp.dest(dest + resourceSrc + 'javascript'));
+        .pipe(gulp.dest(dest + resourceSrc.replace(baseSrc, '') + 'javascript'));
 });
 
 // Compress CSS Files to One File (include pattern lab css and project css)
-gulp.task('css', function() {
-    console.log('gulp - css task');
-    return gulp.src(src + 'css/*.css')
+gulp.task('local:css', function() {
+    return gulp.src(resourceSrc + 'css/*.css')
         .pipe(concatCss('style.css'))
         .pipe(rename({ suffix: '.min' }))
-        .pipe(gulp.dest(dest + resourceSrc + 'css'));
+        .pipe(gulp.dest(dest + resourceSrc.replace(baseSrc, '') + 'css'));
 });
 
 // Cache Images
-gulp.task('images', function() {
-    console.log('gulp - image task');
-    return gulp.src(src + 'images/**/*')
+gulp.task('local:images', function() {
+    return gulp.src(resourceSrc + 'images/**/*')
         .pipe(cache(imagemin({ optimizationLevel: 5, progressive: true, interlaced: true })))
-        .pipe(gulp.dest(dest + resourceSrc + 'images'));
+        .pipe(gulp.dest(dest + resourceSrc.replace(baseSrc, '') + 'images'));
 });
 
 //Cache Fonts?
@@ -55,4 +81,23 @@ gulp.task('images', function() {
 //Parse Templates to Data Definition XML
 
 
-gulp.task('default', gulp.series('init', 'scripts', 'css', 'images'));
+/**
+ * Cacade API Uploading Process
+ */
+
+gulp.task('cascade:init', function() {});
+
+gulp.task('cascade:delete', function() {
+    return gulp.src(dest)
+        .pipe(exec())
+        .dest();
+});
+
+gulp.task('default', ['local:init',
+    'local:scripts',
+    'local:css',
+    'local:images'
+], function() {
+    var cascade = index.initAPI('qa.cascade.emory.edu', 'pshan2', 'Spy62710@');
+    cascade.folder.delete('Pengyin - Test', 'test').then(function(data) { console.log(data); }, function(error) { console.log(error); });
+});

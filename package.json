@@ -1,11 +1,49 @@
 {
-  "name": "jscpa",
-  "version": "1.0.0",
-  "description": "test cpa js framework",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC"
+    "name": "jscpa",
+    "version": "1.0.0",
+    "description": "test cpa js framework",
+    "main": "index.js",
+    "dependecies": {
+        "node-rest-client": "^3.1.0",
+        "bluebird": "^3.4.7",
+        "gulp-clean": "^0.3.2",
+        "gulp-concat": "^2.6.1",
+        "gulp-cssmin": "^0.2.0",
+        "gulp-uglify": "^2.1.2",
+        "minimist": "^1.2.0"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/pshan2/js-framework-test.git"
+    },
+    "author": "Pengyin Shan",
+    "license": "ISC",
+    "dependencies": {
+        "bluebird": "^3.4.7",
+        "gulp-cache": "^0.4.6",
+        "gulp-changed": "^3.1.0",
+        "gulp-clean": "^0.3.2",
+        "gulp-concat": "^2.6.1",
+        "gulp-concat-css": "^2.3.0",
+        "gulp-cssmin": "^0.2.0",
+        "gulp-foreach": "^0.1.0",
+        "gulp-imagemin": "^3.3.0",
+        "gulp-rename": "^1.2.2",
+        "gulp-uglify": "^3.0.0",
+        "mkdirp": "^0.5.1",
+        "node-rest-client": "^3.1.0"
+    },
+    "bugs": {
+        "url": "https://github.com/pshan2/js-framework-test/issues"
+    },
+    "homepage": "https://github.com/pshan2/js-framework-test#readme",
+    "devDependencies": {},
+    "keywords": [
+        "Node.js",
+        "CPA",
+        "Cascade"
+    ]
 }
