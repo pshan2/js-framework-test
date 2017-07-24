@@ -20,11 +20,12 @@ var dir = require('node-dir');
  */
 var baseSrc = 'src/';
 var resourceSrc = baseSrc + '_includes/';
-var vmSrc = 'vm/';
+var vmSrc = baseSrc + '_cms/';
 var dest = 'dest/';
-var hostname = 'qa.emory.edu';
+var hostname = 'qa.cascade.emory.edu';
 var username = 'pshan2';
 var password = 'Spy62710@';
+var siteName = 'PengyinTest';
 
 /**
  * Local modules
@@ -76,7 +77,12 @@ gulp.task('local:images', function() {
 
 //Cache Fonts?
 
-//Parse Templates to Velocity
+//Parse Templates to Velocity. Currently just test file uploading
+gulp.task('local:vm', function() {
+    return gulp.src(baseSrc + 'vm/**/*')
+        .pipe(gulp.dest(dest + vmSrc.replace(baseSrc, '') + 'vm'));
+});
+
 
 //Parse Templates to Data Definition XML
 
@@ -88,23 +94,48 @@ gulp.task('local:images', function() {
 gulp.task('default', ['local:init',
     'local:scripts',
     'local:css',
-    'local:images'
+    'local:images',
+    'local:vm'
 ], function() {
     //var cascadeFolder = index.initFolderAPI('qa.cascade.emory.edu', 'pshan2', 'Spy62710@');
-    var cascadeFile = index.initFileAPI('qa.cascade.emory.edu', 'pshan2', 'Spy62710@');
+    var cascadeFile = index.initFileAPI(hostname, username, password);
+    var cascadeFolder = index.initFolderAPI(hostname, username, password);
 
-    //Read Folder not work -> Go through folder and read file
-    //Need push back action?
+    //Read Folder and Delete Folders that is in dest folder remotely
+    //cascadeFolder.folder.read('CPA - Framework', 'js').then(function(data) { console.log(data); }, function(error) { console.log(error); });
+    //cascadeFolder.folder.delete('PengyinTest', 'Test').then(function(data) { console.log(data); }, function(error) { console.log(error); });
+    //cascadeFolder.folder.write()
+
+    /*
+    dir.paths(dest.substring(0, dest.length - 1),
+        function(err, subdirs) {
+            if (err) throw err;
+            console.log(subdirs);
+            subdirs.dirs.forEach(function(dir) {
+                var d = dir.substring(dir.indexOf(dest) + dest.length);
+                console.log('begin to remove ' + d + ' on server...');
+                cascadeFolder.folder.delete(siteName, d);
+            });
+            subdirs.files.forEach(function(file) {
+                console.log(Object.keys[file]);
+            });
+        });
+        */
+
+    //Write File
     dir.readFiles(dest.substring(0, dest.length - 1), { exclude: /^\./, recursive: true }, function(error, content, filename, next) {
         //file callback
         if (error) { console.log('error when looping inside dest folder: ') + error; return; };
         var filepath = filename.substring(filename.indexOf(dest) + dest.length);
-        console.log(filepath + ' begin...');
-        cascadeFile.file.write('Pengyin - Test', filepath, content);
+        console.log(filepath + ' process begin...');
+
+        //write file
+        cascadeFile.file.write(siteName, filepath, content).then(function(data) {}, function(error) { console.log(error); });
         next();
     }, function(err, files) {
         if (err) throw err;
         console.log('finished reading files:', files);
     });
+
 
 });

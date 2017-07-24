@@ -64,10 +64,10 @@ var init = function(cascadeClient) {
 
                     if (Buffer.isBuffer(dataToWrite)) {
                         console.log(editAssetObj.asset);
-                        editAssetObj.asset.folder["data"] = Array.from((new Int8Array(dataToWrite)));
+                        //editAssetObj.asset.folder["data"] = Array.from((new Int8Array(dataToWrite)));
                     } else {
                         console.log(editAssetObj.asset);
-                        editAssetObj.asset.folder["text"] = dataToWrite;
+                        //editAssetObj.asset.folder["text"] = dataToWrite;
                     }
 
                     if (additionalData === Object(additionalData)) {
@@ -155,16 +155,16 @@ var init = function(cascadeClient) {
                             }
 
                             if (Buffer.isBuffer(dataToWrite)) {
-                                createAssetObj.asset.folder["data"] = Array.from((new Int8Array(dataToWrite)));
+                                //createAssetObj.asset.folder["data"] = Array.from((new Int8Array(dataToWrite)));
                             } else {
-                                createAssetObj.asset.folder["text"] = dataToWrite;
+                                //createAssetObj.asset.folder["text"] = dataToWrite;
                             }
                             return client.createPromise(createAssetObj);
-                        })
+                        });
                     });
                 }
             });
-        }
+        };
     });
 };
 
