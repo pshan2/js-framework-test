@@ -14,7 +14,7 @@ var uglify = require('gulp-uglify');
 var foreach = require('gulp-foreach');
 var imagemin = require('gulp-imagemin');
 var changed = require('gulp-changed');
-
+var dir = require('node-dir');
 /**
  * Constants
  */
@@ -49,14 +49,14 @@ gulp.task('local:init', function() {
 });
 
 // Concatenate & Minify JS -> Compare if changed -> Move to Dist Folder
-gulp.task('local:scripts', function() {
+gulp.task('local:scripts', ['local:init'], function() {
     console.log(dest + resourceSrc + 'javascript');
     return gulp.src(resourceSrc + 'js/*.js')
         .pipe(concat('main.js'))
         .pipe(rename({ suffix: '.min' }))
         .pipe(uglify())
         //.changed(dest + resourceSrc + 'javascript', { hasChanged: changed.compareContent }) Compare
-        .pipe(gulp.dest(dest + resourceSrc.replace(baseSrc, '') + 'javascript'));
+        .pipe(gulp.dest(dest + resourceSrc.replace(baseSrc, '') + 'js'));
 });
 
 // Compress CSS Files to One File (include pattern lab css and project css)
@@ -85,19 +85,26 @@ gulp.task('local:images', function() {
  * Cacade API Uploading Process
  */
 
-gulp.task('cascade:init', function() {});
-
-gulp.task('cascade:delete', function() {
-    return gulp.src(dest)
-        .pipe(exec())
-        .dest();
-});
-
 gulp.task('default', ['local:init',
     'local:scripts',
     'local:css',
     'local:images'
 ], function() {
-    var cascade = index.initAPI('qa.cascade.emory.edu', 'pshan2', 'Spy62710@');
-    cascade.folder.delete('Pengyin - Test', 'test').then(function(data) { console.log(data); }, function(error) { console.log(error); });
+    //var cascadeFolder = index.initFolderAPI('qa.cascade.emory.edu', 'pshan2', 'Spy62710@');
+    var cascadeFile = index.initFileAPI('qa.cascade.emory.edu', 'pshan2', 'Spy62710@');
+
+    //Read Folder not work -> Go through folder and read file
+    //Need push back action?
+    dir.readFiles(dest.substring(0, dest.length - 1), { exclude: /^\./, recursive: true }, function(error, content, filename, next) {
+        //file callback
+        if (error) { console.log('error when looping inside dest folder: ') + error; return; };
+        var filepath = filename.substring(filename.indexOf(dest) + dest.length);
+        console.log(filepath + ' begin...');
+        cascadeFile.file.write('Pengyin - Test', filepath, content);
+        next();
+    }, function(err, files) {
+        if (err) throw err;
+        console.log('finished reading files:', files);
+    });
+
 });

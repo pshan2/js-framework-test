@@ -69,16 +69,28 @@
 
 
 var CascadeRESTAPI = require("./cascade.js");
-
+var cascadeFolderAPI = require("./cascade.folder.js");
 var cascadeFileAPI = require("./cascade.file.js");
 
-exports.initAPI = function(hostname, username, password, config) {
+function initAPI(hostname, username, password, config) {
     //var initAPI = function(hostname, username, password, config) {
     var cascadeRESTAPI = CascadeRESTAPI.init(hostname, username, password, Object.assign({}, config));
-    cascadeFileAPI.init(cascadeRESTAPI);
+    //cascadeFolderAPI.init(cascadeRESTAPI);
+    //cascadeFileAPI.init(cascadeRESTAPI);
     return cascadeRESTAPI;
 }
 
+exports.initFolderAPI = function(hostname, username, password, config) {
+    var cascade = initAPI(hostname, username, password, config);
+    cascadeFolderAPI.init(cascade);
+    return cascade;
+};
+
+exports.initFileAPI = function(hostname, username, password, config) {
+    var cascade = initAPI(hostname, username, password, config);
+    cascadeFileAPI.init(cascade);
+    return cascade;
+};
 //test
 /*
 var cascade = initAPI('qa.cascade.emory.edu', 'pshan2', 'Spy62710@');

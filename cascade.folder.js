@@ -10,11 +10,11 @@ var init = function(cascadeClient) {
         }
     });
 
-    cascadeClient.registerMethod("file", "read", function(client) {
+    cascadeClient.registerMethod("folder", "read", function(client) {
         return function(siteName, path) {
             return client.readPromise({
                 "identifier": {
-                    "type": "file",
+                    "type": "folder",
                     "path": {
                         "siteName": siteName,
                         "path": path
@@ -24,11 +24,11 @@ var init = function(cascadeClient) {
         }
     });
 
-    cascadeClient.registerMethod("file", "delete", function(client) {
+    cascadeClient.registerMethod("folder", "delete", function(client) {
         return function(siteName, path) {
             return client.deletePromise({
                 "identifier": {
-                    "type": "file",
+                    "type": "folder",
                     "path": {
                         "siteName": siteName,
                         "path": path
@@ -38,13 +38,13 @@ var init = function(cascadeClient) {
         };
     });
 
-    cascadeClient.registerMethod("file", "write", function(client) {
+    cascadeClient.registerMethod("folder", "write", function(client) {
         return function(siteName, path, dataToWrite, additionalData) {
             var pathPartsArray = path.split("/");
-            var fileName = pathPartsArray.pop();
+            var folderName = pathPartsArray.pop();
             return client.readPromise({
                 "identifier": {
-                    "type": "file",
+                    "type": "folder",
                     "path": {
                         "siteName": siteName,
                         "path": path
@@ -54,27 +54,28 @@ var init = function(cascadeClient) {
                 if (requestReturn.data.success) {
                     var editAssetObj = {
                         "asset": {
-                            "file": {
-                                "parentFolderId": requestReturn.data.asset.file.parentFolderId,
-                                "id": requestReturn.data.asset.file.id,
-                                "siteId": requestReturn.data.asset.file.siteId
+                            "folder": {
+                                "parentFolderId": requestReturn.data.asset.folder.parentFolderId,
+                                "id": requestReturn.data.asset.folder.id,
+                                "siteId": requestReturn.data.asset.folder.siteId
                             }
                         }
                     };
 
                     if (Buffer.isBuffer(dataToWrite)) {
-                        editAssetObj.asset.file["data"] = Array.from((new Int8Array(dataToWrite)));
+                        console.log(editAssetObj.asset);
+                        editAssetObj.asset.folder["data"] = Array.from((new Int8Array(dataToWrite)));
                     } else {
-                        editAssetObj.asset.file["text"] = dataToWrite;
+                        console.log(editAssetObj.asset);
+                        editAssetObj.asset.folder["text"] = dataToWrite;
                     }
 
                     if (additionalData === Object(additionalData)) {
-                        Object.assign(editAssetObj.asset.file, additionalData);
+                        Object.assign(editAssetObj.asset.folder, additionalData);
                     }
 
-                    var keys = Object.keys(editAssetObj.asset); //test for possible return item.
-                    keys.forEach(function(item) { console.log(item); });
 
+                    console.log(editAssetObj);
                     return client.editPromise(editAssetObj);
                 } else {
                     var pathsStrings = [];
@@ -141,22 +142,22 @@ var init = function(cascadeClient) {
 
                             var createAssetObj = {
                                 "asset": {
-                                    "file": {
+                                    "folder": {
                                         "parentFolderId": partentFolderRequestReturn.data.asset.folder.id,
                                         "siteId": partentFolderRequestReturn.data.asset.folder.siteId,
-                                        "name": fileName
+                                        "name": folderName
                                     }
                                 }
                             };
 
                             if (additionalData === Object(additionalData)) {
-                                Object.assign(createAssetObj.asset.file, additionalData);
+                                Object.assign(createAssetObj.asset.folder, additionalData);
                             }
 
                             if (Buffer.isBuffer(dataToWrite)) {
-                                createAssetObj.asset.file["data"] = Array.from((new Int8Array(dataToWrite)));
+                                createAssetObj.asset.folder["data"] = Array.from((new Int8Array(dataToWrite)));
                             } else {
-                                createAssetObj.asset.file["text"] = dataToWrite;
+                                createAssetObj.asset.folder["text"] = dataToWrite;
                             }
                             return client.createPromise(createAssetObj);
                         })
